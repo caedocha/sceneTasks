@@ -78,19 +78,24 @@ class Project(Task):
 		
 class Asset(Task):
 	
-	helpers = ["yaml", "dirs"]
+	helpers = ["yaml", "dirs", "maya"]
 	
 	def __init__(self, notifier):
 		super(Asset, self).__init__(notifier)
 		
 	def create(self, name, type):
 		local_dirs = ["master", "local"]
-		scenes_path = "./scenes/stock/" + type + "/" + name
-		source_images_path = "./source_images/textures/stock/" + type + "/" + name
+		scenes_path = "scenes/stock/" + type + "/" + name
+		source_images_path = "source_images/textures/stock/" + type + "/" + name
+		master_asset_file = scenes_path + "/master/" + name + "_init_000.ma"
+		local_asset_file = scenes_path + "/local/" + name + "_init_000.ma"
 		self.dirs.create_dir_if_doesnt_exists(scenes_path)
 		self.dirs.create_dir_if_doesnt_exists(source_images_path)
 		[self.dirs.create_dir_if_doesnt_exists(scenes_path + "/" + local_dir) for local_dir in local_dirs]
 		[self.dirs.create_dir_if_doesnt_exists(source_images_path + "/" + local_dir) for local_dir in local_dirs]
+		self.maya.set_project()
+		self.maya.create_scene(master_asset_file)
+		self.maya.create_scene(local_asset_file)
 		self._n.success(type.capitalize() + " " + name + " created!")
 		
 	def rename(self, old_name, new_name, type):
@@ -148,4 +153,21 @@ class Asset(Task):
 					self._n.success("+ File existing in " + results[1], prefix = False)
 			print("\n")
 			
+class ReferencedAsset(Task):
+	
+	helpers = ["dirs", "maya"]
+	
+	def __init__(self, notifier):
+		super(ReferencedAsset, self).__init__(notifier)
 			
+	def list(self):
+		scene_assets = self.dirs.list_assets("scenes/stock")
+		for asset_type in scene_assets.keys():
+			for asset in scene_assets[asset_type]:
+				asset_path = "stock/" + asset_type + "/" + asset + "/master/" + self.dirs.last_scene(asset, asset_type)
+				references = self.maya.list_references(asset_path)
+				self._n.success(asset_type + " - " + asset, prefix = False)
+				for reference_node in references.keys():
+					self._n.success("  -- " + references[reference_node][0], prefix = False)
+					self._n.success("    |", prefix = False)
+					self._n.success("    |---> " + references[reference_node][1], prefix = False)

@@ -3,6 +3,10 @@ import os
 import yaml
 import shutil
 import filecmp
+import sys
+import maya.standalone as std
+import maya.cmds as cmds
+import maya.mel as mel
 
 class Helper(object):
 	
@@ -13,12 +17,31 @@ class Helper(object):
 class MayaConnector(Helper):
 	
 	def init(self, notifier):
-		import sys
-		import maya.standalone as std
 		std.initialize(name='python')
-		import maya.cmds as cmds
 		self.n = notifier
 		return self
+		
+	def set_project(self):
+		current_directory = os.getcwd().replace("\\", "/")
+		mel.eval('setProject "' + current_directory + '";')	
+	
+	def create_scene(self, scene):
+		cmds.file(new = True)
+		cmds.file(rename = scene.replace("\\", "/"))
+		cmds.file(save = True)
+		
+	def list_references(self, scene):
+		references = {}
+		self.set_project()
+		cmds.file(scene, force = True, open = True)
+		raw_references = cmds.ls(references = True)
+		#TODO Add validation for broken references
+		for ref in raw_references:
+			short_name = cmds.referenceQuery(ref, filename = True, shortName = True)
+			path = cmds.referenceQuery(ref, filename = True).replace(os.getcwd().replace("\\", "/"), "")
+			references[ref] = [short_name, path]
+		return references
+		
 	
 
 class YamlHandler(Helper):
@@ -177,5 +200,11 @@ class DirHandler(Helper):
 		for key in subdirectories.keys():
 			subdirectory_comparison = subdirectories[key]
 			self.__compare_dirs_recur(subdirectory_comparison, comparison_result)
+			
+	def last_scene(self, asset, asset_type):
+		asset_master_path = "scenes/stock/" + asset_type + "/" + asset + "/master/"
+		master_files = [f for f in os.listdir(asset_master_path) if os.path.isfile(asset_master_path + f)]
+		return master_files[0]
+		
 				
 				

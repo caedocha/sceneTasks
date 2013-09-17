@@ -1,3 +1,5 @@
+#!C:\Program Files\Autodesk\Maya2013\bin\mayapy.exe
+
 import os
 import sys
 import traceback
@@ -40,6 +42,8 @@ class TaskDispatcher(object):
 			task = tasks.Project(self.__n)
 		elif self.__obj == "asset":
 			task = tasks.Asset(self.__n)
+		elif self.__obj == "reference":
+			task = tasks.ReferencedAsset(self.__n)
 		else:
 			raise ValueError
 		self.initialize_task(task)
