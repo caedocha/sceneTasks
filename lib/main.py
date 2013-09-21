@@ -35,15 +35,21 @@ class TaskDispatcher(object):
 		helpers_hash = {"maya" : MayaConnector, "yaml" : YamlHandler, "dirs" : DirHandler}
 		task.load_helpers(map(lambda h:helpers_hash[h]().init(self.__n), task.required_helpers()))
 	
+	def get_task_from_module(self, obj):
+		""" Gets obj class for specified object in Tasks module. If it doesn't exists, None is returned. """
+		obj_class = None
+		obj = "".join([word.capitalize() for word in obj.split("_")])
+		for module_class in dir(tasks):
+			if obj == module_class:
+				obj_class = getattr(tasks, module_class)
+		return obj_class
+		
 	def dispatch(self):
 		""" Dispatchs the object that handles the action to be executed. """
 		task = None
-		if self.__obj == "project":
-			task = tasks.Project(self.__n)
-		elif self.__obj == "asset":
-			task = tasks.Asset(self.__n)
-		elif self.__obj == "reference":
-			task = tasks.ReferencedAsset(self.__n)
+		obj_class = self.get_task_from_module(self.__obj)
+		if obj_class is not None:
+			task = obj_class(self.__n)
 		else:
 			raise ValueError
 		self.initialize_task(task)

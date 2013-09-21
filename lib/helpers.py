@@ -35,11 +35,16 @@ class MayaConnector(Helper):
 		self.set_project()
 		cmds.file(scene, force = True, open = True)
 		raw_references = cmds.ls(references = True)
-		#TODO Add validation for broken references
 		for ref in raw_references:
-			short_name = cmds.referenceQuery(ref, filename = True, shortName = True)
-			path = cmds.referenceQuery(ref, filename = True).replace(os.getcwd().replace("\\", "/"), "")
-			references[ref] = [short_name, path]
+			short_name = ""
+			path = ""
+			try:
+				short_name = cmds.referenceQuery(ref, filename = True, shortName = True)
+				path = cmds.referenceQuery(ref, filename = True).replace(os.getcwd().replace("\\", "/"), "")
+				broken = False
+			except:
+				broken = True
+			references[ref] = [short_name, path, broken]
 		return references
 		
 	
