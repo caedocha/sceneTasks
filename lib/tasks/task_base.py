@@ -18,7 +18,7 @@ class TaskBase(SceneBase):
 			
 	def load_helpers(self, helpers_obj):
 		for helper, obj in zip(self.helpers, helpers_obj):
-			setattr(self, helper, obj)
+		   setattr(self, helper, obj)
 		
 	def helpers(self):
 		return self.helpers

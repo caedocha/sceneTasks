@@ -6,7 +6,11 @@ import traceback
 import importlib
 from notifier import Notifier
 from helpers import *
+
 from utils.text_formatter import TextFormatter
+from utils.maya_connector import MayaConnector
+from utils.yaml_handler import YamlHandler
+from utils.dir_handler import DirHandler
 
 class ArgParser(object):
 	

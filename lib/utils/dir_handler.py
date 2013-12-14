@@ -1,103 +1,15 @@
-import traceback
 import os
-import yaml
-import shutil
-import filecmp
 import sys
-import maya.standalone as std
-import maya.cmds as cmds
-import maya.mel as mel
+import traceback
+import filecmp
+import shutil
 
-class Helper(object):
+class DirHandler(object):
 	
 	def init(self, notifier):
-		self.n = notifier
-		return self
-		
-class MayaConnector(Helper):
-	
-	def init(self, notifier):
-		std.initialize(name='python')
-		self.n = notifier
-		return self
-		
-	def set_project(self):
-		current_directory = os.getcwd().replace("\\", "/")
-		mel.eval('setProject "' + current_directory + '";')	
-	
-	def create_scene(self, scene):
-		cmds.file(new = True)
-		cmds.file(rename = scene.replace("\\", "/"))
-		cmds.file(save = True)
-		
-	def list_references(self, scene):
-		references = {}
-		self.set_project()
-		cmds.file(scene, force = True, open = True)
-		raw_references = cmds.ls(references = True)
-		for ref in raw_references:
-			short_name = ""
-			path = ""
-			try:
-				short_name = cmds.referenceQuery(ref, filename = True, shortName = True)
-				path = cmds.referenceQuery(ref, filename = True).replace(os.getcwd().replace("\\", "/"), "")
-				broken = False
-			except:
-				broken = True
-			references[ref] = [short_name, path, broken]
-		return references
-		
-	
+	   self.n = notifier
+	   return self
 
-class YamlHandler(Helper):
-	
-	def init(self, notifier):
-		self.n = notifier
-		self.__config_file = "config.yml"
-		return self
-	
-	def create_config_file(self, data, path):
-		"Creates project's configuration file inside config directory"
-		try:
-			if os.path.exists(os.path.join(path, self.__config_file)):
-				self.n.neutral("Config file already exists in " + path)
-			else:
-				stream = file(os.path.join(path, self.__config_file), 'w')
-				yaml.dump(data, stream, default_flow_style = False)
-				self.n.success("Created config file in " + path)
-		except yaml.YAMLError, ex:
-			self.n.error(traceback.format_exc())
-			
-	def delete_config_file(self, path):
-		"Deletes project's configuration file."
-		try:
-			if not os.path.exists(os.path.join(path, self.__config_file)):
-				self.n.neutral("Config file doesn't exists.")
-			else:
-				shutil.rmtree(path)
-		except IOError , ex:
-			self.n.error(traceback.format_exc())
-	
-	def load_config_file(self):
-		""" Sets the working project, all other tasks are executed based on it. """
-		try:
-			config_path = os.path.join(os.getcwd(), "config", self.__config_file)
-			if not os.path.exists(config_path):
-				self.n.error("Config file doesn't exists.")
-				return []
-			else:
-				
-				stream = file(config_path, 'r')
-				return yaml.load(stream)
-		except IOError, ex:
-			self.n.error(traceback.format_exc())
-		
-	
-class DirHandler(Helper):
-	
-	def __init__(self):
-		pass
-	
 	def create_dir_if_doesnt_exists(self, directory):
 		""" Creates a directory if it doesn't exists already. """
 		result = True
@@ -116,7 +28,7 @@ class DirHandler(Helper):
 			self.__create_hash_hierarchy_recur(None, root, directories[root])
 	
 	def __create_hash_hierarchy_recur(self, parent, directory, children):
-		""" Recursives counterpart of creat_hash_hierarchy method. """
+		""" Recursive counterpart of create_hash_hierarchy method. """
 		try:
 			if self.create_dir_if_doesnt_exists(directory):
 				self.n.success("Directory created: " + directory)
@@ -210,6 +122,4 @@ class DirHandler(Helper):
 		asset_master_path = "scenes/stock/" + asset_type + "/" + asset + "/master/"
 		master_files = [f for f in os.listdir(asset_master_path) if os.path.isfile(asset_master_path + f)]
 		return master_files[0]
-		
-				
-				
+
