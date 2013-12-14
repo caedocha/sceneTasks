@@ -1,87 +1,11 @@
-import traceback
-import datetime
-from notifier import Notifier
+from task_base import TaskBase
 
-class Task(object):
-	
-	handlers = []
-	
-	def __init__(self, notifier):
-		self._n = notifier
-		
-	def exec_command(self, command, params):
-		try:
-			getattr(self, command)(*params)
-		except Exception, ex:
-			self._n.error(traceback.format_exc())
-			
-	def load_helpers(self, helpers_obj):
-		for helper, obj in zip(self.helpers, helpers_obj):
-			setattr(self, helper, obj)
-		
-	def required_helpers(self):
-		return self.helpers
-
-class Project(Task):
-	
-	helpers = ["yaml", "dirs"]
-	
-	def __init__(self, notifier):
-		self.__projects_dirs = {"scenes" : 
-							{
-							"stock": 
-								["char", "prop", "scenery", "util"]
-							, "work" : None
-							} 
-					,"source_images" : 
-						{
-						"textures": 
-							{
-							"stock" : 
-								["char", "prop", "scenery", "util"] 
-							}
-						, "footage" : None
-						} 
-					}
-		super(Project, self).__init__(notifier)
-	
-	def which(self):
-		config_data = self.yaml.load_config_file()
-		project_name = config_data['project']['name']
-		self._n.success("Project name: " + project_name, prefix = False)
-		
-	def created_on(self, format = None):
-		config_data = self.yaml.load_config_file()
-		created_on_date = config_data['project']['created_on']
-		if format is None:
-			self._n.success("Created on: " + str(created_on_date.strftime("%d-%m-%Y")), prefix = False)
-		else:
-			self._n.success("Created on: " + str(created_on_date.strftime(format	)), prefix = False)
-		
-	
-	def create(self, name):
-		data = dict(
-			project = dict(
-				name= name,
-				created_on= datetime.datetime.now() 
-			)
-		)
-		self.dirs.create_hash_hierarchy(self.__projects_dirs)
-		self.dirs.create_dir_if_doesnt_exists("./config/")
-		self.yaml.create_config_file(data, "./config/")
-		self._n.success("Project created!")
-		
-	def delete(self):
-		self.dirs.delete_hash_hierarchy(self.__projects_dirs.keys())
-		self.yaml.delete_config_file("./config/")
-		self._n.success("Project deleted!")
-		
-class Asset(Task):
+class AssetTask(TaskBase):
 	
 	helpers = ["yaml", "dirs", "maya"]
 	
-	def __init__(self, notifier):
-		super(Asset, self).__init__(notifier)
+	def __init__(self):
+		super(AssetTask, self).__init__()
 		
 	def create(self, name, type):
 		local_dirs = ["master", "local"]
@@ -152,36 +76,3 @@ class Asset(Task):
 				else:
 					self._n.success("+ File existing in " + results[1], prefix = False)
 			print("\n")
-			
-class ReferencedAsset(Task):
-	
-	helpers = ["dirs", "maya"]
-	
-	def __init__(self, notifier):
-		super(ReferencedAsset, self).__init__(notifier)
-			
-	def list(self):
-		scene_assets = self.dirs.list_assets("scenes/stock")
-		for asset_type in scene_assets.keys():
-			for asset in scene_assets[asset_type]:
-				asset_path = "stock/" + asset_type + "/" + asset + "/master/" + self.dirs.last_scene(asset, asset_type)
-				references = self.maya.list_references(asset_path)
-				self._n.success(asset_type + " - " + asset, prefix = False)
-				for reference_node in references.keys():
-					if references[reference_node][2]:
-						self._n.error("    -- Can't load " + reference_node + ", it's broken!", prefix = False)
-					else:
-						self._n.success("  -- " + references[reference_node][0], prefix = False)
-						self._n.success("    |", prefix = False)
-						self._n.success("    |---> " + references[reference_node][1], prefix = False)					
-					print("\n")
-	
-	def using(self, asset, type):
-		scene_assets = self.dirs.list_assets("scenes/stock")
-		for asset_type in scene_assets.keys():
-			for asset in scene_assets[asset_type]:
-				asset_path = "stock/" + asset_type + "/" + asset + "/master/" + self.dirs.last_scene(asset, asset_type)
-				references = self.maya.list_references(asset_path)
-				for reference_node  in references.keys():
-					print reference_node
-		
