@@ -22,12 +22,12 @@ class Reference(ModelBase):
       return self.missing or self.broken
 
    @staticmethod
-   def all():
+   def all(default_dir):
       """ Lists all the references in the project. """
       references = []
       assets = Asset.all()
       for asset in assets:
-         references.extend(Reference.get_references(asset))
+         references.extend(Reference.get_references(asset), default_dir = default_dir)
       return references
 
    @staticmethod
@@ -36,14 +36,14 @@ class Reference(ModelBase):
       return filter(lambda r: r.is_broken(), Reference.all())
  
    @staticmethod
-   def find_by_using_asset(asset):
+   def find_by_using_asset(asset, default_dir):
       """ Find references that are included in the using asset. """
-      return filter(lambda r: r.using_asset.name == asset.name, Reference.all())
+      return filter(lambda r: r.using_asset.name == asset.name, Reference.all(default_dir))
 
    @staticmethod
-   def find_by_referenced_asset(asset):
+   def find_by_referenced_asset(asset, default_dir):
       """ Find references that include the referenced asset. """
-      return filter(lambda r: r.referenced_asset.name == asset.name, filter(lambda r: not r.missing, Reference.all()))
+      return filter(lambda r: r.referenced_asset.name == asset.name, filter(lambda r: not r.missing, Reference.all(default_dir)))
 
    @staticmethod
    def get_references(asset, default_dir = "master"):

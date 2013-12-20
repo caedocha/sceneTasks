@@ -182,3 +182,8 @@ class Asset(ModelBase):
       if self.__scenes is None:
          self.__scenes = DefaultDirectory(paths.SCENES_STOCK, self)
       return self.__scenes
+
+   def texture_maps(self, default_dir):
+      pass
+
+
