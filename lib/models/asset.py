@@ -7,7 +7,7 @@ import maya.mel as mel
 import config.settings as settings
 import config.paths as paths
 from model_base import ModelBase
-from referenced_asset import ReferencedAsset
+from texture_map import TextureMap
 from utils.maya_connector import MayaConnector
 
 class DefaultDirectory(object):
@@ -60,21 +60,7 @@ class DefaultDirectory(object):
    def local(self):
       """ Shotcut to return only the local directory path. """
       return self.defaults()[1]
-  
-   def latest_local(self, full = False):
-      """ Get the latest file path of local directory. If full = True, returns absolute path. """ 
-      if full:
-         return os.path.join(self.local(), os.listdir(self.local())[-1])
-      else:
-         return os.listdir(self.local())[-1]
-         
-   def latest_master(self, full = False):
-      """ Get the latest file path of master directory. If full = True, returns absolute path. """ 
-      if full:
-         return os.path.join(self.master(), os.listdir(self.master())[-1])
-      else:
-         return os.listdir(self.master())[-1]
-
+   
    def refresh(self, asset):
       """ Refreshes the asset instance, in case it has change. """
       self.__asset = asset
@@ -134,6 +120,26 @@ class Asset(ModelBase):
    def is_broken(self):
       """ Checks if the asset is broken: has any missing or empty default directory. """
       return self.scenes().is_missing_any() or self.scenes().is_empty_any() or self.source_images().is_missing_any()
+   
+   def latest_local(self, full = False):
+      """ Get the latest file path of local directory. If full = True, returns absolute path. """ 
+      try:
+         if full:
+            return os.path.join(self.scenes().local(), os.listdir(self.scenes().local())[-1])
+         else:
+            return os.listdir(self.local())[-1]
+      except Exception, ex:
+         return []
+
+   def latest_master(self, full = False):
+      """ Get the latest file path of master directory. If full = True, returns absolute path. """ 
+      try:
+         if full:
+            return os.path.join(self.scenes().master(), os.listdir(self.scenes().master())[-1])
+         else:
+            return os.listdir(self.scenes().master())[-1]
+      except Exception, ex:
+         return []
 
    @staticmethod
    def all():
@@ -148,7 +154,7 @@ class Asset(ModelBase):
    @staticmethod
    def find(type = None, name = None):
       """ Finds assets by name or type. Name has priority over type if both parameters are given. """
-      assets = None
+      assets = [] 
       all_assets = Asset.all()
       if type is not None:
          assets = filter(lambda a: a.type == type, all_assets)
@@ -163,7 +169,7 @@ class Asset(ModelBase):
 
    def references(self):
       """ Lists the references used by the asset. """
-      return ReferencedAsset.find(self.name)
+      pass
 
    def source_images(self):
       """ Returns a default directory object which has all the information regarding source_images paths. """
