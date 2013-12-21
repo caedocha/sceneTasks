@@ -17,6 +17,7 @@ class DefaultDirectory(object):
       self.__path = path
 
    def path(self):
+      """ Returns the asset path. """
       return os.path.join(os.getcwd(), self.__path, self.__asset.type, self.__asset.name)
 
    def defaults(self):
@@ -81,6 +82,9 @@ class Asset(ModelBase):
          os.makedirs(self.scenes().local())
          os.makedirs(self.source_images().master())
          os.makedirs(self.source_images().local())
+         for mat in settings.DEFAULT_MAPS:
+            os.makedirs(os.path.join(self.source_images().master(), mat))
+            os.makedirs(os.path.join(self.source_images().local(), mat))
          MayaConnector.set_project()
          master_file = os.path.join(self.scenes().master(), settings.SCENE_FILE % (self.name.lower(), '000', 'init')).replace('\\', '/')
          local_file = os.path.join(self.scenes().local(), settings.SCENE_FILE % (self.name.lower(), '000', 'init')).replace('\\', '/')
@@ -184,6 +188,29 @@ class Asset(ModelBase):
       return self.__scenes
 
    def texture_maps(self, default_dir):
-      pass
-
-
+      """ List all texture maps of the asset """
+      texture_maps = []
+      default_dir_path = current_file = scene_path = ''
+      if default_dir == "master":
+         default_dir_path = self.source_images().master()
+         scene_path = self.scenes().master()
+      else:
+         default_dir_path = self.source_images().local()
+         scene_path = self.scenes().local()
+      for mat_dir in os.listdir(default_dir_path):
+         for mat_file in os.listdir(os.path.join(default_dir_path, mat_dir)):
+            if current_file == '':
+               current_file = mat_file
+            else:
+               current_obj_name = current_file.split('_')[0]
+               mat_obj_name = mat_file.split('_')[0]
+               current_mat_name = current_file.split('_')[1]
+               mat_mat_name = mat_file.split('_')[1]
+               current_mat_version = os.path.basename(current_file.split('_')[-1])
+               mat_file_version = os.path.basename(mat_file.split('_')[-1])
+               if mat_file_version > current_mat_version:
+                  current_file = mat_file
+               if (current_obj_name != mat_obj_name) or ( current_mat_name != mat_mat_name):
+                  texture_maps.append(TextureMap(mat_dir, current_mat_name, current_obj_name, default_dir, scene_path))
+                  current_file = mat_file
+      return texture_maps
