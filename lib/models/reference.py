@@ -31,9 +31,9 @@ class Reference(ModelBase):
       return references
 
    @staticmethod
-   def list_broken():
+   def list_broken(default_dir):
       """ Lists all the broken references, which means that the file is missing. """
-      return filter(lambda r: r.is_broken(), Reference.all())
+      return filter(lambda r: r.is_broken(), Reference.all(default_dir))
  
    @staticmethod
    def find_by_using_asset(asset, default_dir):

@@ -1,34 +1,69 @@
 from task_base import TaskBase
+from models.reference import Reference
+from models.asset import Asset
 
 class ReferencedAssetTask(TaskBase):
 	
-	helpers = ["dirs", "maya"]
-	
 	def __init__(self):
 		super(ReferencedAssetTask, self).__init__()
-			
-	def list(self):
-		scene_assets = self.dirs.list_assets("scenes/stock")
-		for asset_type in scene_assets.keys():
-			for asset in scene_assets[asset_type]:
-				asset_path = "stock/" + asset_type + "/" + asset + "/master/" + self.dirs.last_scene(asset, asset_type)
-				references = self.maya.list_references(asset_path)
-				self._n.success(asset_type + " - " + asset, prefix = False)
-				for reference_node in references.keys():
-					if references[reference_node][2]:
-						self._n.error("    -- Can't load " + reference_node + ", it's broken!", prefix = False)
-					else:
-						self._n.success("  -- " + references[reference_node][0], prefix = False)
-						self._n.success("    |", prefix = False)
-						self._n.success("    |---> " + references[reference_node][1], prefix = False)					
-					print("\n")
 	
-	def using(self, asset, type):
-		scene_assets = self.dirs.list_assets("scenes/stock")
-		for asset_type in scene_assets.keys():
-			for asset in scene_assets[asset_type]:
-				asset_path = "stock/" + asset_type + "/" + asset + "/master/" + self.dirs.last_scene(asset, asset_type)
-				references = self.maya.list_references(asset_path)
-				for reference_node  in references.keys():
-					print reference_node
+	def __format_reference(reference):
+		""" Prints the reference with format """
+		self._n.success("Using asset: %s:%s" % (reference.using_asset.name, reference.using_asset.type))
+		self._n.success("Referenced asset: %s:%s" % (reference.referenced_asset.name, reference.referenced_asset.type))
+		self._n.success('-' * 10)
+
+	def list(self):
+		try:
+			master_references = Reference.all('master')
+			local_references = Reference.all('local')
+			self._n.success('List of master references:')
+			for ref in master_references:
+				self.__format_reference(ref)
+			self._n.success('\n List of local references:')
+			for ref in local_references:
+				self.__format_reference(ref)
+		except Exception, ex:
+			self._n.error('There was a problem listing all the references in the project.')
+
+	def list_using(self, asset):
+		try:
+			asset = Asset.find(name = asset)
+			master_references = Reference.find_by_referenced_asset(asset, 'master')
+			local_references = Reference.find_by_referenced_asset(asset, 'local')
+			self._n.success('List of master references:')
+			for ref in master_references:
+				self.__format_reference(ref)
+			self._n.success('\n List of local references:')
+			for ref in local_references:
+				self.__format_reference(ref)
+		except Exception, ex:
+			self._n.error('There was a problem listing the using references in the project.')
+
+	def list_references(self, asset):
+		try:
+			asset = Asset.find(name = asset)
+			master_references = Reference.find_by_using_asset(asset, 'master')
+			local_references = Reference.find_by_using_asset(asset, 'local')
+			self._n.success('List of master references:')
+			for ref in master_references:
+				self.__format_reference(ref)
+			self._n.success('\n List of local references:')
+			for ref in local_references:
+				self.__format_reference(ref)
+		except Exception, ex:
+			self._n.error('There was a problem listing all the  referenced references in the project.')
+
+	def list_broken(self):
+		try:
+			master_references = Reference.list_broken('master')
+			local_references = Reference.list_broken(asset, 'local')
+			self._n.success('List of master references:')
+			for ref in master_references:
+				self.__format_reference(ref)
+			self._n.success('\n List of local references:')
+			for ref in local_references:
+				self.__format_reference(ref)
+		except Exception, ex:
+			self._n.error('There was a problem listing all the broken references in the project.')
 

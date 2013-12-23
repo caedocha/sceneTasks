@@ -192,10 +192,10 @@ class Asset(ModelBase):
       texture_maps = []
       default_dir_path = current_file = scene_path = ''
       if default_dir == "master":
-         default_dir_path = self.source_images().master()
+         default_dir_path = self.latest_master()
          scene_path = self.scenes().master()
       else:
-         default_dir_path = self.source_images().local()
+         default_dir_path = self.latest_local()
          scene_path = self.scenes().local()
       for mat_dir in os.listdir(default_dir_path):
          for mat_file in os.listdir(os.path.join(default_dir_path, mat_dir)):
