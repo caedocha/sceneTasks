@@ -5,14 +5,16 @@ import maya.standalone as std
 import maya.cmds as cmds
 import maya.mel as mel
 from utils.maya_connector import MayaConnector
+from utils.list_utils import ListUtils
 from model_base import ModelBase
 
 class TextureMap(ModelBase):
 
-	def __init__(self, attr, shader, obj, default_dir, asset_path):
+	def __init__(self, attr, shader, obj, version, default_dir, asset_path):
 		self.attr = attr
 		self.shader = shader
 		self.obj = obj
+		self.version = version
 		self.default_dir = default_dir
 		self.asset_path = asset_path
 
@@ -51,12 +53,13 @@ class TextureMap(ModelBase):
 		except:
 			return False
 
+
 	def is_connected(self):
 		""" Checks if the map exists but is not connectedto the material for two reasons:
 			 1. It hasn't been done. 2. Material doesn't exists. """
 		is_connected = False
 		MayaConnector.set_project()
-		cmds.open(self.asset_path)
+		cmds.file(self.asset_path, open = True)
 		if self.__is_valid_shader():
 			node = cmds.listConnections('%s.%s' % (self.shader, self.attr))
 			if self.__is_valid_file(node):
@@ -72,7 +75,9 @@ class TextureMap(ModelBase):
 			else:
 				is_connected = False
 		else:
-			return False
+			is_connected = False
+		
+		return is_connected
 
 	def is_broken(self):
 		""" Checks if texture map file is not connected to a node or missing. """
