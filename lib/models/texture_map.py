@@ -25,7 +25,7 @@ class TextureMap(ModelBase):
 	def __is_valid_shader(self):
 		try:
 			cmds.select(self.shader)
-			cmds.select(cmds.listConnections('%s.%s' % (self.shader. self.attr))[0])
+			cmds.select(cmds.listConnections('%s.%s' % (self.shader, self.attr))[0])
 			return True
 		except:
 			return False
@@ -61,15 +61,15 @@ class TextureMap(ModelBase):
 		MayaConnector.set_project()
 		cmds.file(self.asset_path, open = True)
 		if self.__is_valid_shader():
-			node = cmds.listConnections('%s.%s' % (self.shader, self.attr))
+			node = str(cmds.listConnections('%s.%s' % (self.shader, self.attr))[0])
 			if self.__is_valid_file(node):
-				is_connected = True
+				return True
 			else:
 				is_connected = False
 			if self.__is_valid_gamma(node):
-				value_node = cmds.listConnections('%s.%s' % (node, 'value'))[0]
+				value_node = str(cmds.listConnections('%s.%s' % (node, 'value'))[0])
 				if self.__is_valid_file(node):
-					is_connected = True
+					return True
 				else:
 					is_connected = False
 			else:
