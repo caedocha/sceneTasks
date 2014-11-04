@@ -4,11 +4,11 @@ from models.project import Project
 from utils.notifier import Notifier
 
 class ProjectTask(TaskBase):
-	
+
 	def __init__(self):
 		self._n = Notifier()
 		super(ProjectTask, self).__init__()
-	
+
 	def info(self):
 		try:
 			project = Project.get()
@@ -25,7 +25,7 @@ class ProjectTask(TaskBase):
 				for missing_dir in project.directories().missing():
 					self._n.success('\t - ' + missing_dir, prefix = False)
 		except Exception, ex:
-			self._n.error("There was a problem fetching the project's info")  
+			self._n.error("There was a problem fetching the project's info")	
 
 	def create(self, name):
 		try:
@@ -42,4 +42,3 @@ class ProjectTask(TaskBase):
 			self._n.success("Project deleted!")
 		except Exception, ex:
 			self._n.error("There was a problem deleting the project.")
-

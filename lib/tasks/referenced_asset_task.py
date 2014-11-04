@@ -3,10 +3,10 @@ from models.reference import Reference
 from models.asset import Asset
 
 class ReferencedAssetTask(TaskBase):
-	
+
 	def __init__(self):
 		super(ReferencedAssetTask, self).__init__()
-	
+
 	def __format_reference(reference):
 		""" Prints the reference with format """
 		self._n.success("Using asset: %s:%s" % (reference.using_asset.name, reference.using_asset.type))
@@ -52,7 +52,7 @@ class ReferencedAssetTask(TaskBase):
 			for ref in local_references:
 				self.__format_reference(ref)
 		except Exception, ex:
-			self._n.error('There was a problem listing all the  referenced references in the project.')
+			self._n.error('There was a problem listing all the	referenced references in the project.')
 
 	def list_broken(self):
 		try:
@@ -66,4 +66,3 @@ class ReferencedAssetTask(TaskBase):
 				self.__format_reference(ref)
 		except Exception, ex:
 			self._n.error('There was a problem listing all the broken references in the project.')
-

@@ -13,25 +13,25 @@ from utils.list_utils import ListUtils
 
 class DefaultDirectory(object):
 
-	 def __init__(self, path, asset):
+	def __init__(self, path, asset):
 			self.__asset = asset
 			self.__path = path
 
-	 def path(self):
+	def path(self):
 			""" Returns the asset path. """
 			return os.path.join(os.getcwd(), self.__path, self.__asset.type, self.__asset.name)
 
-	 def defaults(self):
+	def defaults(self):
 			""" Returns a list of the asset's default paths. """
 			master_path = os.path.join(os.getcwd(), self.__path, self.__asset.type, self.__asset.name, 'master')
 			local_path = os.path.join(os.getcwd(), self.__path, self.__asset.type, self.__asset.name, 'local')
 			return [master_path, local_path]
 
-	 def is_missing_any(self):
+	def is_missing_any(self):
 			""" Checks if any of the default directories are missing. """
 			return self.which_missing() != [] 
 
-	 def which_missing(self):
+	def which_missing(self):
 			""" Returns a list of the missing default directories. """
 			missing = []
 			if not os.path.isdir(self.master()):
@@ -40,11 +40,11 @@ class DefaultDirectory(object):
 				 missing.append('local')
 			return missing
 
-	 def is_empty_any(self):
+	def is_empty_any(self):
 			""" Checks if any of the default directories are empty."""
 			return self.which_empty() != []
 			
-	 def which_empty(self):
+	def which_empty(self):
 			""" Returns a list of the empty default directories. """
 			empty = []
 			if not 'master' in self.which_missing():
@@ -55,28 +55,28 @@ class DefaultDirectory(object):
 						empty.append('local')
 			return empty
 
-	 def master(self):
+	def master(self):
 			""" Shortcut to return only the master directory path. """
 			return self.defaults()[0]
-	 
-	 def local(self):
+
+	def local(self):
 			""" Shotcut to return only the local directory path. """
 			return self.defaults()[1]
-	 
-	 def refresh(self, asset):
+
+	def refresh(self, asset):
 			""" Refreshes the asset instance, in case it has change. """
 			self.__asset = asset
 
 class Asset(ModelBase):
 
-	 def __init__(self, name, type):
+	def __init__(self, name, type):
 			self.name = name
 			self.type = type
 			self.__source_images = None
 			self.__scenes = None
 			super(Asset, self).__init__()
 
-	 def create(self):
+	def create(self):
 			""" Creates an asset in a maya directory, which includes default directories and maya scenes. """
 			try:
 				 os.makedirs(self.scenes().master())
@@ -98,7 +98,7 @@ class Asset(ModelBase):
 			except IOError, ex:
 				 raise
 
-	 def update(self, name = None, type = None):
+	def update(self, name = None, type = None):
 			""" Updates the name of the asset, this includes the directory and maya scene file. Also, if the type is updated, it's moved to the new type's directory. """
 			if name is not None:
 				 for msd in os.listdir(self.scenes().master()):
@@ -111,8 +111,8 @@ class Asset(ModelBase):
 				 shutil.move(self.source_images().path(), self.source_images().path().replace(self.name, name))
 				 self.name = name
 			if type is not None:
-				 shutil.move(self.scenes().path(), self.scenes().path().replace(self.type, type))					
-				 shutil.move(self.source_images().path(), self.source_images().path().replace(self.type, type))					
+				 shutil.move(self.scenes().path(), self.scenes().path().replace(self.type, type))
+				 shutil.move(self.source_images().path(), self.source_images().path().replace(self.type, type))
 				 self.type = type
 			self.scenes().refresh(self)
 			self.source_images().refresh(self)
@@ -127,7 +127,7 @@ class Asset(ModelBase):
 			return self.scenes().is_missing_any() or self.scenes().is_empty_any() or self.source_images().is_missing_any()
 	 
 	 def latest_local(self, full = False):
-			""" Get the latest file path of local directory. If full = True, returns absolute path. """ 
+			""" Get the latest file path of local directory. If full = True, returns absolute path. """
 			try:
 				 if full:
 						return os.path.join(self.scenes().local(), os.listdir(self.scenes().local())[-1])
@@ -137,7 +137,7 @@ class Asset(ModelBase):
 				 return []
 
 	 def latest_master(self, full = False):
-			""" Get the latest file path of master directory. If full = True, returns absolute path. """ 
+			""" Get the latest file path of master directory. If full = True, returns absolute path. """
 			try:
 				if full:
 						return os.path.join(self.scenes().master(), os.listdir(self.scenes().master())[-1])
@@ -146,54 +146,23 @@ class Asset(ModelBase):
 			except Exception, ex:
 				return []
 
-	 @staticmethod
-	 def all():
-			""" Returns all the project's assets. """
-			assets = []
-			asset_dir = os.path.join(os.getcwd(), paths.SCENES_STOCK)
-			for asset_type in os.listdir(asset_dir):
-				 for asset in os.listdir(os.path.join(asset_dir, asset_type)):
-						assets.append(Asset(asset, asset_type))
-			return assets
-	 
-	 @staticmethod
-	 def find(type = None, name = None):
-			""" Finds assets by name or type. Name has priority over type if both parameters are given. """
-			assets = [] 
-			all_assets = Asset.all()
-			if type is not None:
-				assets = filter(lambda a: a.type == type, all_assets)
-			if name is not None:
-				assets = filter(lambda a: a.name == name, all_assets)
-			return assets
-
-	 @staticmethod
-	 def list_broken():
-			""" Finds all broken assets. """
-			return filter(lambda a: a.is_broken(), Asset.all()) 
-
-	 def references(self):
+	def references(self):
 			""" Lists the references used by the asset. """
 			pass
 
-	 def source_images(self):
+	def source_images(self):
 			""" Returns a default directory object which has all the information regarding source_images paths. """
 			if self.__source_images is None:
 				self.__source_images = DefaultDirectory(paths.SOURCE_IMG_STOCK, self)
 			return self.__source_images
 
-	 def scenes(self):
+	def scenes(self):
 			""" Returns a default directory object which has all the information regarding scenes paths. """
 			if self.__scenes is None:
 				self.__scenes = DefaultDirectory(paths.SCENES_STOCK, self)
 			return self.__scenes
 
-	 def __chop_texture_file_name(self, texture_file_name):
-			splitted_file_name = texture_file_name.split('_')
-			info = { 'obj': splitted_file_name[0], 'shader': splitted_file_name[1], 'version': os.path.splitext(splitted_file_name[2])[0], 'ext': os.path.splitext(splitted_file_name[2])[1]}
-			return info
-
-	 def texture_maps(self, default_dir):
+	def texture_maps(self, default_dir):
 			""" List all texture maps of the asset """
 			texture_maps = []
 			default_dir_path = scene_path = ''
@@ -206,7 +175,7 @@ class Asset(ModelBase):
 			mat_dirs = os.listdir(default_dir_path)
 			for current_dir in mat_dirs:
 				maps = os.listdir(os.path.join(default_dir_path, current_dir))
-				if  maps != []:
+				if	maps != []:
 					for current_file, next_file in ListUtils.pairwise(maps):
 						current_info = self.__chop_texture_file_name(current_file)
 						if next_file is not None:
@@ -216,3 +185,34 @@ class Asset(ModelBase):
 						else:
 								texture_maps.append(TextureMap(current_dir, current_info['shader'], current_info['obj'], current_info['version'], default_dir, scene_path))
 			return texture_maps
+
+	@staticmethod
+	def all():
+			""" Returns all the project's assets. """
+			assets = []
+			asset_dir = os.path.join(os.getcwd(), paths.SCENES_STOCK)
+			for asset_type in os.listdir(asset_dir):
+				 for asset in os.listdir(os.path.join(asset_dir, asset_type)):
+						assets.append(Asset(asset, asset_type))
+			return assets
+	
+	@staticmethod
+	def find(type = None, name = None):
+			""" Finds assets by name or type. Name has priority over type if both parameters are given. """
+			assets = [] 
+			all_assets = Asset.all()
+			if type is not None:
+				assets = filter(lambda a: a.type == type, all_assets)
+			if name is not None:
+				assets = filter(lambda a: a.name == name, all_assets)
+			return assets
+
+	@staticmethod
+	def list_broken():
+			""" Finds all broken assets. """
+			return filter(lambda a: a.is_broken(), Asset.all())
+
+	def __chop_texture_file_name(self, texture_file_name):
+			splitted_file_name = texture_file_name.split('_')
+			info = { 'obj': splitted_file_name[0], 'shader': splitted_file_name[1], 'version': os.path.splitext(splitted_file_name[2])[0], 'ext': os.path.splitext(splitted_file_name[2])[1]}
+			return info

@@ -33,8 +33,8 @@ class TaskDispatcher(object):
 		pass
 
 	def import_task_module(self, module_name):
-		 """ Dynamically imports a task module. """
-		 return importlib.import_module("tasks.%s_task" % (module_name))
+		""" Dynamically imports a task module. """
+		return importlib.import_module("tasks.%s_task" % (module_name))
 
 	def get_task_from_module(self, obj):
 		""" Gets obj class for specified object in Tasks module. If it doesn't exists, None is returned. """
@@ -57,7 +57,7 @@ class TaskDispatcher(object):
 		task.exec_command(self.__action, self.__params)
 
 class Main(object):
-	
+
 	def __init__(self, args):
 		self.__args = args
 
@@ -81,4 +81,3 @@ class Main(object):
 
 if __name__ == "__main__":
 	 Main(sys.argv).init()
-

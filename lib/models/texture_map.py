@@ -22,38 +22,6 @@ class TextureMap(ModelBase):
 		""" Checks if the referenced file of the texture node is missing. """
 		pass
 
-	def __is_valid_shader(self):
-		try:
-			cmds.select(self.shader)
-			cmds.select(cmds.listConnections('%s.%s' % (self.shader, self.attr))[0])
-			return True
-		except:
-			return False
-
-	def __is_valid_gamma(self, node):
-		try:
-			if cmds.nodeType(node) == 'gammaCorrect':
-				value_node = cmds.listConnections('%s.%s' % (node, 'value'))[0]
-				cmds.select(value_node)
-				return True
-			else:
-				return False
-		except:
-			return False
-
-	def __is_valid_file(self, node):
-		try:
-			if cmds.nodeType(node) == 'file':
-				if cmds.getAttr('%s.fileTextureName' % (node)) != '' :
-					return True
-				else:
-					return False
-			else:
-				return False
-		except:
-			return False
-
-
 	def is_connected(self):
 		""" Checks if the map exists but is not connectedto the material for two reasons:
 			 1. It hasn't been done. 2. Material doesn't exists. """
@@ -84,7 +52,37 @@ class TextureMap(ModelBase):
 		return self.is_missing() or self.is_not_connected()
 
 	def connect(self):
-		""" Connects the texture map file to the texture node if it's not connected. 
+		""" Connects the texture map file to the texture node if it's not connected.
 		If there's no texture node, it's created too. """
 		pass
 
+	def __is_valid_shader(self):
+		try:
+			cmds.select(self.shader)
+			cmds.select(cmds.listConnections('%s.%s' % (self.shader, self.attr))[0])
+			return True
+		except:
+			return False
+
+	def __is_valid_gamma(self, node):
+		try:
+			if cmds.nodeType(node) == 'gammaCorrect':
+				value_node = cmds.listConnections('%s.%s' % (node, 'value'))[0]
+				cmds.select(value_node)
+				return True
+			else:
+				return False
+		except:
+			return False
+
+	def __is_valid_file(self, node):
+		try:
+			if cmds.nodeType(node) == 'file':
+				if cmds.getAttr('%s.fileTextureName' % (node)) != '' :
+					return True
+				else:
+					return False
+			else:
+				return False
+		except:
+			return False

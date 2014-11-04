@@ -3,7 +3,7 @@ from task_base import TaskBase
 from models.asset import Asset
 
 class AssetTask(TaskBase):
-	
+
 	def __init__(self):
 		super(AssetTask, self).__init__()
 		
