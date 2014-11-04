@@ -43,6 +43,6 @@ class Notifier(object):
 
 	def mute(self):
 		self.__mute = True
-	
+
 	def unmute(self):
 		self.__mute = False

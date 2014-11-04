@@ -6,7 +6,7 @@ class AssetTask(TaskBase):
 
 	def __init__(self):
 		super(AssetTask, self).__init__()
-		
+
 	def create(self, name, type):
 		try:
 			asset = Asset(name, type)
@@ -27,7 +27,7 @@ class AssetTask(TaskBase):
 		except Exception, ex:
 			self._n.error('There was a problem updating the asset.')
 			self._n.error(traceback.format_exc())
-	
+
 	def delete(self, name, type):
 		try:
 			asset = Asset.find(name = name)[0]
@@ -36,10 +36,10 @@ class AssetTask(TaskBase):
 		except Exception, ex:
 			self._n.error('There was a problem deleting the asset.')
 			self._n.error(traceback.format_exc())
-	
+
 	def list(self, type = None):
 		try:
-			if type == None:
+			if type is None:
 				assets = Asset.all()
 			else:
 				assets = Asset.find(type = type)

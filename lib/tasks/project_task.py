@@ -25,7 +25,7 @@ class ProjectTask(TaskBase):
 				for missing_dir in project.directories().missing():
 					self._n.success('\t - ' + missing_dir, prefix = False)
 		except Exception, ex:
-			self._n.error("There was a problem fetching the project's info")	
+			self._n.error("There was a problem fetching the project's info")
 
 	def create(self, name):
 		try:

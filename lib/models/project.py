@@ -11,14 +11,14 @@ class DefaultDirectory(object):
 
 	def defaults(self):
 		""" Returns the project's default file structure in form of a dictionary. """
-		return {"scenes": paths.SCENE_HASH, "source_images" : paths.SOURCE_IMG_HASH} 
-		return {"assets": paths.SCENE_HASH, "workshops" : paths.SOURCE_IMG_HASH} 
+		return {"scenes": paths.SCENE_HASH, "source_images": paths.SOURCE_IMG_HASH}
+		return {"assets": paths.SCENE_HASH, "workshops": paths.SOURCE_IMG_HASH}
 
 	def existing(self):
 		""" Returns the project's existing default directories. """
 		existing_dirs = []
 		default_dirs = ['config', paths.SCENES_PATH, paths.SCENES_STOCK, paths.SOURCE_IMG_PATH, paths.SOURCE_IMG_STOCK
-				,os.path.join(paths.SCENES_PATH, 'work'), os.path.join(paths.SOURCE_IMG_PATH, 'footage')]
+			, os.path.join(paths.SCENES_PATH, 'work'), os.path.join(paths.SOURCE_IMG_PATH, 'footage')]
 		default_dirs.extend(map(lambda d: os.path.join(paths.SCENES_STOCK, d), paths.SCENE_HASH['stock']))
 		default_dirs.extend(map(lambda d: os.path.join(paths.SOURCE_IMG_STOCK, d), paths.SOURCE_IMG_HASH['stock']))
 		for def_dir in default_dirs:
@@ -30,7 +30,7 @@ class DefaultDirectory(object):
 		""" Returns the project's missing default directories. """
 		missing_dirs = []
 		default_dirs = [paths.SCENES_PATH, paths.SCENES_STOCK, paths.SOURCE_IMG_PATH, paths.SOURCE_IMG_STOCK
-				, os.path.join(paths.SCENES_PATH, 'work'), os.path.join(paths.SOURCE_IMG_PATH, 'footage')]
+			, os.path.join(paths.SCENES_PATH, 'work'), os.path.join(paths.SOURCE_IMG_PATH, 'footage')]
 		default_dirs.extend(map(lambda d: os.path.join(paths.SCENES_STOCK, d), paths.SCENE_HASH['stock']))
 		default_dirs.extend(map(lambda d: os.path.join(paths.SOURCE_IMG_STOCK, d), paths.SOURCE_IMG_HASH['stock']))
 		for def_dir in default_dirs:
@@ -46,7 +46,7 @@ class Project(ModelBase):
 
 	def __init__(self, name, created_on):
 		self.name = name
-		self.created_on = created_on 
+		self.created_on = created_on
 		self.__directories = None
 		self.__assets = None
 		self.__references = None

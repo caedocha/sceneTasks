@@ -63,7 +63,8 @@ class Main(object):
 
 	def add_dir_to_import(self, dir_to_import):
 		""" Append directory to system path. """
-		sys.path.append(os.path.join("~\\Documents\\maya\\2013-x64\\scripts\\sceneTasks\\lib" , dir_to_import))
+		sys.path.append(os.path.join("~\\Documents\\maya\\2013-x64\\scripts\\sceneTasks\\lib", dir_to_import))
+
 	def load_app_directories(self):
 		""" Loads directories used by the app, such as, utils and tasks. """
 		self.add_dir_to_import(".")
@@ -80,4 +81,4 @@ class Main(object):
 			self.__n.error(traceback.format_exc())
 
 if __name__ == "__main__":
-	 Main(sys.argv).init()
+	Main(sys.argv).init()

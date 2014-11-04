@@ -24,7 +24,7 @@ class TextureMap(ModelBase):
 
 	def is_connected(self):
 		""" Checks if the map exists but is not connectedto the material for two reasons:
-			 1. It hasn't been done. 2. Material doesn't exists. """
+			1. It hasn't been done. 2. Material doesn't exists. """
 		is_connected = False
 		MayaConnector.set_project()
 		cmds.file(self.asset_path, open = True)
@@ -44,7 +44,6 @@ class TextureMap(ModelBase):
 				is_connected = False
 		else:
 			is_connected = False
-		
 		return is_connected
 
 	def is_broken(self):
@@ -78,7 +77,7 @@ class TextureMap(ModelBase):
 	def __is_valid_file(self, node):
 		try:
 			if cmds.nodeType(node) == 'file':
-				if cmds.getAttr('%s.fileTextureName' % (node)) != '' :
+				if cmds.getAttr('%s.fileTextureName' % (node)) != '':
 					return True
 				else:
 					return False

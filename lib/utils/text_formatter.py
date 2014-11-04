@@ -10,4 +10,4 @@ class TextFormatter(object):
 	@staticmethod
 	def snake_case(target, sep = "_"):
 		""" Converts camel case string to snake case. """
-		return sep.join([s.lower() for s in filter(lambda s: s != "", re.split("([A-Z][a-z]*)",target))])
+		return sep.join([s.lower() for s in filter(lambda s: s != "", re.split("([A-Z][a-z]*)", target))])

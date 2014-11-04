@@ -14,4 +14,4 @@ class ListUtils(object):
 				i += 1
 			yield items[len(items) - 1], None
 		else:
-			raise IndexError	
+			raise IndexError
